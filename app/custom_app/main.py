@@ -37,5 +37,5 @@ def post_data(event):
     post = models.Post(**json_parsed)
 
     # create record here... outside the scope!
-    record_id = uuid.uuid4()
-    return 201, {"data": record_id}
+    record_id = str(uuid.uuid4())
+    return 201, {"id": record_id}

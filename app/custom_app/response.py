@@ -5,18 +5,20 @@ import json
 from dataclass.encoder import encode
 
 
-def response(code: int, id_: str, data=None, **kwargs):
+def response(code: int, id_: str, **kwargs):
     """Generate json encodable and consistent responses for lambda functions"""
 
     response_ = {
         "statusCode": code,
         "isBase64Encoded": False,
+        "headers": {
+            "x-aws-lambda-id": id_
+        }
     }
 
-    body = {"eventId": id_, **kwargs}
-
-    if data is not None:
-        body["data"] = encode(data)
-
+    body = {}
+    for key, value in kwargs.items():
+        body[key] = encode(value)
+ 
     response_["body"] = json.dumps(body)
     return response_
