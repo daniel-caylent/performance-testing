@@ -34,7 +34,10 @@ def post_data(event):
     except:
         return 400, {"detail": "Unable to parse JSON from body."}
 
-    post = models.Post(**json_parsed)
+    try:
+        post = models.Post(**json_parsed)
+    except Exception as e:
+        return 400, {"detail": dataclass_error_to_str(e)}
 
     # create record here... outside the scope!
     record_id = str(uuid.uuid4())

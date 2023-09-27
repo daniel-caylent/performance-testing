@@ -1,7 +1,7 @@
 import uuid
 import os
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response, Depends
 from mangum import Mangum
 
 import models
@@ -18,16 +18,18 @@ def __get_data(search):
     ]
 
 @app.get("/fastapi")
-def get_data(search: str=None):
+def get_data(search: models.Search = Depends()):
 
-  data = __get_data(search)
+  data = __get_data(search.search)
   return data
 
 @app.post("/fastapi")
-def post_data(post: models.Post):
+def post_data(post: models.Post, response: Response):
 
     # create record here... outside the scope!
     record_id = uuid.uuid4()
+
+    response.status_code = 201
     return {"id": record_id}
 
 @app.middleware("http")
@@ -36,5 +38,6 @@ async def add_event_id(request: Request, call_next):
     request_id = request.scope["aws.context"].aws_request_id
     response.headers["x-aws-lambda-id"] = request_id
     return response
+
 
 handler = Mangum(app)
